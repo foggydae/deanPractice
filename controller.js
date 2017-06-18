@@ -5,8 +5,13 @@ function addMapping(router, mapping) {
 			var path = url.substring(4);
 			router.get(path, mapping[url]);
 		}
+        else if(url.startsWith("POST ")) {
+            var path = url.substring(5);
+            router.post(path, mapping[url]);
+            
+        }
 		else {
-			console.log(`invalid URL: ${url}`);
+			consol.log(`invalid URL: ${url}`);
 		}
 	}
 }
