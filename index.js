@@ -3,9 +3,10 @@ const session = require('koa-session');
 const bodyParser = require('koa-bodyparser');
 // const router = require('koa-router')();
 const app = new Koa();
+app.keys=['its is a test'];
 
-const session-config = require('./session');
-app.use(session(session-config, app));
+let sessionConfig = require('./session');
+app.use(session(sessionConfig, app));
 global.model = require('./model');
 app.use(bodyParser());
 const controller = require('./controller');

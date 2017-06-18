@@ -1,5 +1,6 @@
 var userState = async (ctx, next) => {
     var state = ctx.session.userState;
+	console.log(state);
     if (state === 'admin' ||
         state === 'teacher' ||
         state === 'student')
@@ -12,12 +13,16 @@ var userState = async (ctx, next) => {
     }
 };
 var testState = async (ctx, next) => {
+	console.log(ctx.session);
     var state = ctx.request.body.state;
+	console.log(state);
     ctx.session.state = state;
+	console.log(ctx.session);
+    ctx.body = {code:200};
 }
 
 
 module.exports = {
     "GET /userState": userState,
-    "POST /testState": testState
+    "POST /userState": testState
 };
