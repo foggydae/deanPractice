@@ -1,0 +1,19 @@
+{
+  "name": "dean",
+  "version": "1.0.0",
+  "description": "dean practice with node and vue",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "nodejs",
+    "vue"
+  ],
+  "author": "smallst",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.2.0",
+    "koa-router": "^7.2.1"
+  }
+}
