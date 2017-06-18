@@ -1,13 +1,22 @@
 
 
 <body>
+    <script type="text/javascript" src="libs/js/axios.min.js"></script>
     <script>
-     axios.get('/api/userState')
+     axios.get('api/userState')
           .then((response) => {
-              console.log(response);
+              data = response.data;
+              console.log(data);
+              if(data.content.state === "logout")
+                  {
+                      window.location.href = '/login.html';
+                  }
+              else
+                  {
+                      window.location.href = '/' + data.content.state + ".html";
+                  }
           }).catch(function(error){
               console.log(error);
      });
     </script>    
-    <script type="text/javascript" src="/libs/js/axios.min.js"></script>
 </body>

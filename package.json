@@ -4,7 +4,7 @@
   "description": "dean practice with node and vue",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "node --use-strict index.js"
   },
   "keywords": [
     "nodejs",

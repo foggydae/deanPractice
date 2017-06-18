@@ -1,0 +1,41 @@
+<body>
+    <div class="login">
+        
+
+        <input type="text" v-model="userId" />
+        <input type="password" v-model="passwd" />
+        <input type="button" value="login" @click="doLogin()" />
+    </div>
+    <script type="text/javascript" src="libs/js/vue.min.js"></script>
+    <script type="text/javascript" src="libs/js/axios.min.js"></script>
+    <script>
+     new Vue({
+         el: ".login",
+         data:{
+             userId: '',
+             passwd: ''
+         },
+         methods:{
+             doLogin: function(){
+                 console.log('dologin');
+                 if(this.userId !== '' && this.passwd !== '')
+                     {
+                         axios.post('api/userState',{
+                             state: 'student'
+                         }).then((response) =>{
+                             console.log(response);
+//                             window.location.href = '/';
+                         }).catch((error) => {
+                             console.log(error);
+                         });
+                     }
+                 else
+                     {
+                         
+                     }
+             }
+         }
+     }
+     );
+    </script>
+</body>

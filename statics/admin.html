@@ -1,0 +1,125 @@
+<head>
+    <meta name="generator" content="content" charset="utf-8"/>
+    <style type="text/css" media="screen">
+     .res{
+         width: 100%;
+         height: 8em;
+         overflow-y: scroll;
+     }
+    </style>
+</head>
+<body>
+    <h1>hello, Admin!</h1>
+    <div class="addPerson">
+        <p>add student:</p>
+        <p>idNumber:<input type="text" v-model="newp.id" /></p>
+        <p>name:<input type="text" v-model="newp.name" /></p>
+        <p>
+            gender:
+            <select v-model="newp.gender">
+                <option value="0"> 男 </option>
+                <option value="1"> 女 </option>
+            </select>
+        </p>
+        <p>
+            role:
+            <select v-model="newp.role">
+                <option value="teacher">teacher</option>
+                <option value="student">student</option>
+            </select>
+        </p>
+        <input type="button" value="add" @click="addPerson" />
+    </div>
+    <div class="queryPerson">
+        <input type="button" value="queryAll" @click="queryAll" />
+        <input type="text" v-model="id" />
+        <input type="button" value="queryOne" @click="queryOne"/>
+        <div class="res">
+            <table>
+                <thead>
+                    <tr>
+                        <th>role</th>
+                        <th>Name</th>
+                        <th>id</th>
+                        <th>gender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="person in persons">
+                        <td>{{ person.rol }}</td>
+                        <td>{{ person.name }}</td>
+                        <td>{{ person.userId }}</td>
+                        <td v-if="person.gender">'nv'</td>
+                        <td v-else>'nan'</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" src="libs/js/vue.min.js"></script>
+    <script type="text/javascript" src="libs/js/axios.min.js"></script>
+    <script>
+     let qP = new Vue({
+         el:".queryPerson",
+         data: {
+             id: '',
+             persons: []
+         },
+         methods: {
+             queryAll: ()=>{
+                 console.log('queryAll');
+                 axios.get('api/queryPerson').then((response)=>{
+                     let body = response.data;
+                     console.log(body);
+                     if(body.code === 200)
+                         {
+                             let data = body.content;
+                             console.log(data);
+                             qP.persons = data;
+                         }
+                 })
+             },
+             queryOne: ()=>{
+                 axios.get('api/queryOne',{
+                     params:{
+                         id: this.id
+                     }
+                 }).then((response)=>{
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             let data = body.content;
+                         }
+                 })
+             }
+         }
+     })
+     let aP = new Vue({
+         el: ".addPerson",
+         data:{
+             newp:{
+                 id: '',
+                 name: '',
+                 gender: 0,
+                 role: 'student'
+             }
+         },
+         methods:{
+             addPerson: function(){
+                 axios.post('api/addPerson',this.newp).then((response)=>{
+                     let data = response.data;
+                     console.log(data);
+                     this.newp = {
+                         id: '',
+                         name: '',
+                         gender: 0,
+                         role: 'student'
+                     };
+                 })
+             }
+         }
+     })
+    </script>
+</body>
