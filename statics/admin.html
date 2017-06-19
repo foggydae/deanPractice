@@ -6,69 +6,113 @@
          height: 8em;
          overflow-y: scroll;
      }
+     .active{
+         display: block;
+     }
+     .hide {
+         display: none;
+     }
     </style>
 </head>
 <body>
     <h1>hello, Admin!</h1>
-    <div class="addPerson">
-        <p>add student:</p>
-        <p>idNumber:<input type="text" v-model="newp.id" /></p>
-        <p>name:<input type="text" v-model="newp.name" /></p>
-        <p>
-            gender:
-            <select v-model="newp.gender">
-                <option value="0"> 男 </option>
-                <option value="1"> 女 </option>
-            </select>
-        </p>
-        <p>
-            role:
-            <select v-model="newp.role">
-                <option value="teacher">teacher</option>
-                <option value="student">student</option>
-            </select>
-        </p>
-        <input type="button" value="add" @click="addPerson" />
+    <div class="body">
+        <input type="button" @click="togg" v-model="text"/>
     </div>
-    <div class="queryPerson">
-        <input type="button" value="queryAll" @click="queryAll" />
-        <input type="text" v-model="id" />
-        <input type="button" value="queryOne" @click="queryOne"/>
-        <div class="res">
-            <table>
-                <thead>
-                    <tr>
-                        <th>role</th>
-                        <th>Name</th>
-                        <th>id</th>
-                        <th>gender</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="person in persons">
-                        <td>{{ person.rol }}</td>
-                        <td>{{ person.name }}</td>
-                        <td>{{ person.userId }}</td>
-                        <td v-if="person.gender">'nv'</td>
-                        <td v-else>'nan'</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="person">
+        <div class="addPerson" :class="isPerson? 'active':'hide'">
+            <p>add student:</p>
+            <p>idNumber:<input type="text" v-model="newp.id" /></p>
+            <p>name:<input type="text" v-model="newp.name" /></p>
+            <p>
+                gender:
+                <select v-model="newp.gender">
+                    <option value="0"> 男 </option>
+                    <option value="1"> 女 </option>
+                </select>
+            </p>
+            <p>
+                role:
+                <select v-model="newp.role">
+                    <option value="teacher">teacher</option>
+                    <option value="student">student</option>
+                </select>
+            </p>
+            <input type="button" value="add" @click="addPerson" />
+        </div>
+        <div class="queryPerson" :class="isPerson? 'active':'hide'">
+            <input type="button" value="queryAll" @click="queryAll" />
+            <input type="text" v-model="id" />
+            <input type="button" value="queryOne" @click="queryOne"/>
+            <div class="res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>role</th>
+                            <th>Name</th>
+                            <th>id</th>
+                            <th>gender</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="person in persons">
+                            <td>{{ person.rol }}</td>
+                            <td>{{ person.name }}</td>
+                            <td>{{ person.userId }}</td>
+                            <td v-if="person.gender">'nv'</td>
+                            <td v-else>'nan'</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-
+    <div class="course" :class="isPerson? 'hide': 'active'">
+        <div class="addCourse" :class="isPerson? 'hide': 'active'">
+            <p>add course:</p>
+            <p>idNumber:<input type="text" v-model="newc.id" /></p>
+            <p>name:<input type="text" v-model="newc.name" /></p>
+            <p>information:<textarea v-model="newc.information" rows="5" cols="10"></textarea></p>
+            <input type="button" value="add" @click="addCourse" />
+        </div>
+        <div class="queryCourse" :class="isPerson? 'hide': 'active'">
+            <input type="button" value="queryAll" @click="queryAll" />
+            <input type="text" v-model="id" />
+            <input type="button" value="queryOne" @click="queryOne"/>
+            <div class="res">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>id</th>
+                            <th>information</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="course in courses">
+                            <td>{{ course.name }}</td>
+                            <td>{{ course.number }}</td>
+                            <td>{{ course.information }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" src="libs/js/vue.min.js"></script>
     <script type="text/javascript" src="libs/js/axios.min.js"></script>
     <script>
+     window.isPerson = true;
      let qP = new Vue({
          el:".queryPerson",
          data: {
+             isPerson: window.isPerson,
              id: '',
              persons: []
          },
          methods: {
-             queryAll: ()=>{
+             queryAll: function(){
                  console.log('queryAll');
                  axios.get('api/queryPerson').then((response)=>{
                      let body = response.data;
@@ -81,16 +125,17 @@
                          }
                  })
              },
-             queryOne: ()=>{
-                 axios.get('api/queryOne',{
+             queryOne: function(){
+                 axios.get('api/queryPerson',{
                      params:{
-                         id: this.id
+                         id: qP.id
                      }
                  }).then((response)=>{
                      let body = response.data;
                      if(body.code === 200)
                          {
                              let data = body.content;
+                             qP.persons = data;
                          }
                  })
              }
@@ -99,6 +144,7 @@
      let aP = new Vue({
          el: ".addPerson",
          data:{
+             isPerson: window.isPerson,
              newp:{
                  id: '',
                  name: '',
@@ -108,18 +154,105 @@
          },
          methods:{
              addPerson: function(){
-                 axios.post('api/addPerson',this.newp).then((response)=>{
-                     let data = response.data;
-                     console.log(data);
-                     this.newp = {
-                         id: '',
-                         name: '',
-                         gender: 0,
-                         role: 'student'
-                     };
-                 })
+                 axios.post('api/addPerson',this.newp)
+                      .then((response)=>{
+                          let data = response.data;
+                          console.log(data);
+                          this.newp = {
+                              id: '',
+                              name: '',
+                              gender: 0,
+                              role: 'student'
+                          };
+                      })
              }
          }
      })
+    </script>
+    <script>
+     let qC = new Vue({
+         el: ".queryCourse",
+         data:{
+             isPerson: window.isPerson,
+             id: '',
+             courses: []
+         },
+         methods:{
+             queryOne: function(){
+                 axios.get('api/queryCourse',{
+                     where:{
+                         number: qC.id
+                     }
+                 }).then((response)=>{
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             let data = body.content;
+                             qC.courses = data;
+                         }
+                 })
+                 
+             },
+             queryAll: ()=>{
+                 axios.get('api/queryCourse')
+                      .then((response)=>{
+                          let body = response.data;
+                          if(body.code === 200)
+                              {
+                                  let data = body.content;
+                                  qC.courses = data;
+                              }
+                      })
+             }
+         }
+     });
+     let aC = new Vue({
+         el: ".addCourse",
+         data:{
+             isPerson: window.isPerson,
+             newc:{
+                 id: '',
+                 name: '',
+                 informatin: ''
+             }
+         },
+         methods:{
+             addCourse: function(){
+                 axios.post("api/addCourse",this.newc)
+                      .then((response)=>{
+                          let data = response.data;
+                          console.log(data);
+                          this.newc = {
+                              id: '',
+                              name : '',
+                              information: ''
+                          };
+                      });
+             }
+         }
+     });
+    </script>
+    <script>
+     
+     let body = new Vue({
+         el: ".body",
+         data:{
+             isPerson: window.isPerson,
+             text: 'modify Course'
+         },
+         methods:{
+             togg:function(){
+                 console.log(body.isPerson);
+                 window.isPerson = !window.isPerson;
+                 body.isPerson = window.isPerson;
+                 aC.isPerson = window.isPerson;
+                 aP.isPerson = window.isPerson;
+                 qC.isPerson = window.isPerson;
+                 qP.isPerson = window.isPerson;
+                 this.text = window.isPerson? 'modify Course':'modify Person';
+             }
+         }
+     });
+     
     </script>
 </body>

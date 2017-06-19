@@ -1,7 +1,7 @@
 const User = global.model.User;
 var userState = async (ctx, next) => {
     var state = ctx.session.userState;
-	console.log(state);
+    console.log(state);
     if (state === 'admin' ||
         state === 'teacher' ||
         state === 'student')
@@ -14,11 +14,11 @@ var userState = async (ctx, next) => {
     }
 };
 var testState = async (ctx, next) => {
-	console.log(ctx.session);
+    console.log(ctx.session);
     var state = ctx.request.body.state;
-	console.log(state);
+    console.log(state);
     ctx.session.userState = state;
-	console.log(ctx.session);
+    console.log(ctx.session);
     ctx.body = {code:200};
 };
 var addPerson = async (ctx, next) =>{
@@ -35,17 +35,35 @@ var addPerson = async (ctx, next) =>{
         };
     }).
         catch ((err)=>{
-        ctx.body = {code: 400};
+            ctx.body = {code: 400};
         });
 };
 var queryPersons = async (ctx, next) => {
     await next();
-    await User.findAll().then(res => {
-        ctx.body = {
-            code: 200,
-            content: res,
-        };
-    });
+    console.log(ctx.request.query.id)
+    let uId = ctx.request.query.id;
+    if(uId !== undefined)
+    {
+        await User.findAll({
+            where:{
+                userId: uId
+            }
+        }).then(res => {
+            ctx.body = {
+                code: 200,
+                content: res
+            };
+        });
+    }
+    else
+    {
+        await User.findAll().then(res => {
+            ctx.body = {
+                code: 200,
+                content: res
+            };
+        });
+    }
 }
 
 
