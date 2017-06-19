@@ -1,25 +1,29 @@
 <head>
     <meta name="generator" content="content" charset="utf-8"/>
+    <style type="text/css" media="screen">
+     table{
+         height: 6em;
+         overflow-y:scroll
+     }
+    </style>
 </head>
 <body>
     <div class="course">
         <div class="myCourse">
-            <input type="button" value="我的课程" @click="togg"/>
+            <input type="button" value="我的课程" @click="queryAll"/>
             <div class="myCourseList" >
                 
-            </div>
-        </div>
-        <div class="courseDetail">
-            
-        </div>
-        <div class="claimCourse">
-            <input type="button" value="认领课程" @click="queryAll"/>
                 <table>
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>id</th>
                             <th>information</th>
+                            <th>grade1</th>
+                            <th>grade2</th>
+                            <th>grade3</th>
+                            <th>confirm</th>
+                            <th>manage</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,7 +31,62 @@
                             <td>{{ course.name }}</td>
                             <td>{{ course.number }}</td>
                             <td>{{ course.information }}</td>
-                            <td><input type="button" value="claim" @click="claimCourse(index)" /></td>
+                            <td><input type="number" v-model="course.grade1" /></td>
+                            <td><input type="number" v-model="course.grade2" /></td>
+                            <td><input type="number" v-model="course.grade3" /></td>
+                            <td><input type="button" value="confirm" @click="settleGrade(index)" /></td>
+                            <td><input type="button" value="manage" @click="manage(index)" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="courseDetail">
+            <p>选课学生:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>courseNumber</th>
+                            <th>courseName</th>
+                            <th>studentId</th>
+                            <th>studentNumber</th>
+                            <th>grade1</th>
+                            <th>grade2</th>
+                            <th>grade3</th>
+                            <th>confirm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(student, index) in course_students">
+                            <td>{{ course.number }}</td>
+                            <td>{{ course.name }}</td>
+                            <td>{{ student.studentId }}</td>
+                            <td>{{ student.name }}</td>
+                            <td><input type="number" v-model="student.grade1" /></td>
+                            <td><input type="number" v-model="student.grade2" /></td>
+                            <td><input type="number" v-model="student.grade3" /></td>
+                            <td><input type="button" value="confirm" @click="settleGrade(index)" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+        <div class="claimCourse">
+            <input type="button" value="认领课程" @click="queryAll"/>
+            <table>
+            <thead>
+            <tr>
+            <th>Name</th>
+            <th>id</th>
+            <th>information</th>
+                        </tr>
+                    </thead>
+            <tbody>
+            <tr v-for="(course, index) in courses">
+            <td>{{ course.name }}</td>
+            <td>{{ course.number }}</td>
+            <td>{{ course.information }}</td>
+            <td><input type="button" value="claim" @click="claimCourse(index)" /></td>
                         </tr>
                     </tbody>
                 </table>
@@ -38,6 +97,83 @@
     <script type="text/javascript" src="libs/js/vue.min.js"></script>
     <script>
      window.tId = '9000022711';
+    </script>
+    <script>
+     let cD = new Vue({
+         el: ".courseDetail",
+         data: {
+             course: {},
+             course_students: []
+         },
+         methods: {
+             settleGrade: function(index){
+                 axios.post('api/settleGrade', {
+                     studentId: this.course_students[index].studentId,
+                     courseNumber: this.course_students[index].courseNumber,
+                     grade1: student.grade1,
+                     grade2: student.grade2,
+                     grade3: student.grade3,
+                 }).then(response=>{
+                     let body= response.data;
+                     if(body.code !== 200)
+                         {
+                             console.log(body);
+                             alert('err');
+                         }
+                 })
+             }
+         }
+     })
+     let mC = new Vue({
+         el: ".myCourse",
+         data:{
+             courses:[],
+         },
+         methods:{
+             queryAll: function(){
+                 axios.get('api/queryTeacherCourse',{
+                     params:{
+                         teacherId: window.tId
+                     }
+                 }).then(response => {
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             mC.courses = body.content;
+                         }
+                 })
+             },
+             settleGrade: function(index){
+                 axios.post('api/editCourse', {
+                     id: this.courses[index].id,
+                     teacherId: window.tId,
+                     courseNumber: this.courses[index].courseNumber,
+                     grade1: this.courses[index].grade1,
+                     grade2: this.courses[index].grade2,
+                     grade3: this.courses[index].grade3
+                 }).then(response => {
+                     let body = response.data;
+                     if(body.code !== 200)
+                         {
+                             console.log(body)
+                             alert('err');
+                         }
+                 });
+             },
+             manage: function(index) {
+                 axios.get('api/getCourseStudent',{
+                     courseNumber: this.courses[index].courseNumber
+                 }).then(response => {
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             cD.course = mC.courses[index];
+                             cD.course_students = body.content;
+                         }
+                 })
+             }
+         }
+     })
     </script>
     <script>
      let cC = new Vue({

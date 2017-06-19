@@ -65,10 +65,104 @@ let claimCourse = async (ctx, next) => {
         };
     })
 };
+let settleGrade = async (ctx, next) => {
+    await next();
+    let sId = ctx.request.body.studentId,
+        cNumber = ctx.request.body.courseNumber,
+        grade1 = ctx.request.grade1,
+        grade2 = ctx.request.grade2,
+        grade3 = ctx.request.grade3;
+    await Student_Course.update(
+        {
+            grade1: grade1,
+            grade2: grade2,
+            grade3: grade3
+        },
+        {
+            where:{
+                studentId: sId,
+                courseNumber: cNumber
+            }
+        }
+    ).then(res=>{
+        ctx.body = {
+            code: 200
+        };
+    }).catch(err => {
+        ctx.body = {
+            code: 500,
+            content: err
+        };
+    })
+};
+let  queryTeacherCourse = async (ctx, next) => {
+    await next();
+    let tId = ctx.request.query.teacherId;
+    await Teacher_Course.findAll({
+        where:{
+            teacherId: tId
+        }
+    }).then(res => {
+        ctx.body = {
+            code: 200,
+            content: res
+        };
+    })
+};
+let editCourse = async (ctx, next) => {
+    await next();
+    let id = ctx.request.body.id,
+        tId = ctx.request.body.teacherId,
+        cNumber = ctx.request.body.courseNumber,
+        grade1 = ctx.request.body.grade1, 
+        grade2 = ctx.request.body.grade2, 
+        grade3 = ctx.request.body.grade3;
+    await Teacher_Course.update(
+        {
+            grade1: grade1,
+            grade2: grade2,
+            grade3: grade3
+        },
+        {
+            where:{
+                id: id,
+                teacherId: tId,
+                courseNumber: cNumber
+            }
+        }
+    ).then(res=>{
+        ctx.body = {
+            code: 200
+        };
+    }).catch(err=>{
+        ctx.body = {
+            code: 500,
+            content: err
+        };
+    })
+};
+let getCourseStudent = async(ctx, next) => {
+    await next();
+    let cNumber = ctx.request.query.courseNumber;
+    await Student_Course.findAll({
+        where:{
+            courseNumber: cNumber
+        }
+    }).then(res=>{
+        ctx.body = {
+            code : 200,
+            content: res
+        };
+    })
+};
 
 module.exports = {
     "POST /addCourse"  : addCourse,
     "GET /queryCourse" : queryCourse,
 
-    "POST /claimCourse" : claimCourse
+    "POST /claimCourse"       : claimCourse,
+    "GET /getCourseStudent"   : getCourseStudent,
+    "POST /editCourse"        : editCourse,
+    "GET /queryTeacherCourse" : queryTeacherCourse,
+    "POST /settleGrade"       : settleGrade
 };
