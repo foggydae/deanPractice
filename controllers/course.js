@@ -88,16 +88,30 @@ let chooseCourse = async (ctx, next) =>{
 };
 let settleGrade = async (ctx, next) => {
     await next();
-    let sId = ctx.request.body.studentId,
+    var sId = ctx.request.body.studentId,
         cNumber = ctx.request.body.courseNumber,
-        grade1 = ctx.request.grade1,
-        grade2 = ctx.request.grade2,
-        grade3 = ctx.request.grade3;
+        grade1 = ctx.request.body.grade1,
+        grade2 = ctx.request.body.grade2,
+        grade3 = ctx.request.body.grade3;
+    var weight = [], grade;
+    await Teacher_Course.findOne({
+        where:{
+            courseNumber: cNumber
+        },
+        raw:true
+    }).then(res=>{
+        weight = [res.grade1,res.grade2,res.grade3];
+        grade = (grade1 * weight[0] + grade2 * weight[1] + grade3 * weight[2])/100;
+    });
+        console.log(weight);
+        console.log(grade);
+    console.log(grade);
     await Student_Course.update(
         {
             grade1: grade1,
             grade2: grade2,
-            grade3: grade3
+            grade3: grade3,
+            grade: grade
         },
         {
             where:{
@@ -114,7 +128,7 @@ let settleGrade = async (ctx, next) => {
             code: 500,
             content: err
         };
-    })
+    });
 };
 let  queryTeacherCourse = async (ctx, next) => {
     await next();
@@ -185,7 +199,7 @@ let getCourseStudent = async(ctx, next) => {
                 where:{userId: Sequelize.col('`Student-Course`.studentId')
                       }
             }
-            ],
+        ],
         where:{
             courseNumber: cNumber
         }

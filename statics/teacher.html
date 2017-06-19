@@ -110,9 +110,9 @@
                  axios.post('api/settleGrade', {
                      studentId: this.course_students[index].studentId,
                      courseNumber: this.course_students[index].courseNumber,
-                     grade1: student.grade1,
-                     grade2: student.grade2,
-                     grade3: student.grade3,
+                     grade1: this.course_students[index].grade1,
+                     grade2: this.course_students[index].grade2,
+                     grade3: this.course_students[index].grade3,
                  }).then(response=>{
                      let body= response.data;
                      if(body.code !== 200)
