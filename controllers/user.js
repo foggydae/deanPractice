@@ -21,6 +21,7 @@ var testState = async (ctx, next) => {
     console.log(ctx.session);
     ctx.body = {code:200};
 };
+
 var addPerson = async (ctx, next) =>{
     await next();
     await User.create({
@@ -40,7 +41,6 @@ var addPerson = async (ctx, next) =>{
 };
 var queryPersons = async (ctx, next) => {
     await next();
-    console.log(ctx.request.query.id)
     let uId = ctx.request.query.id;
     if(uId !== undefined)
     {
