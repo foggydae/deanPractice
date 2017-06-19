@@ -1,0 +1,126 @@
+<head>
+    <meta name="generator" content="content" charset="utf-8"/>
+</head>
+
+<body>
+    <div class="course">
+        <div class="myCourse">
+            <input type="button" value="我的课程" @click="queryAll"/>
+            <div class="myCourseList" >
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>id</th>
+                            <th>information</th>
+                            <th>grade1</th>
+                            <th>grade2</th>
+                            <th>grade3</th>
+                            <th>grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(course, index) in courses">
+                            <td>{{ course.Course.name }}</td>
+                            <td>{{ course.Course.number }}</td>
+                            <td>{{ course.Course.information }}</td>
+                            <td>{{course.grade1}}</td>
+                            <td>{{course.grade2}}</td>
+                            <td>{{course.grade3}}</td>
+                            <td>{{course.grade}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="chooseCourse">
+            
+            <input type="button" value="选课" @click="queryAll"/>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>id</th>
+                        <th>information</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(course, index) in courses">
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.number }}</td>
+                        <td>{{ course.information }}</td>
+                        <td><input type="button" value="choose" @click="chooseCourse(index)" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="libs/js/axios.min.js"></script>
+    <script type="text/javascript" src="libs/js/vue.min.js"></script>
+    <script>
+     window.sId = '1300012757';
+    </script>
+    <script>
+     let mC = new Vue({
+         el: ".myCourse",
+         data:{
+             courses:[],
+         },
+         methods:{
+             queryAll: function(){
+                 axios.get('api/queryStudentCourse',{
+                     params:{
+                         studentId: window.sId
+                     }
+                 }).then(response => {
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             mC.courses = body.content;
+                         }
+                     else
+                         {
+                             console.log(body.content);
+                         }
+                 })
+             }
+         }
+     });
+    </script>
+    <script>
+     let cC = new Vue({
+         el: ".chooseCourse",
+         data:{
+             courses:[]
+         },
+         methods:{
+             queryAll:function(){
+                 axios.get('api/queryCourse')
+                      .then((response)=>{
+                          let body = response.data;
+                          if(body.code === 200)
+                              {
+                                  let data = body.content;
+                                  cC.courses = data;
+                              }
+                      });
+             },
+             chooseCourse:function(index){
+                 axios.post('api/chooseCourse',{
+                     studentId: window.sId,
+                     courseNumber: this.courses[index].number
+                 }).then(response=>{
+                     let body = response.data;
+                     if(body.code === 200)
+                         {
+                             this.courses.splice(index,1);
+                         }
+                 });
+             }
+             
+         }
+     })
+    </script>
+</body>

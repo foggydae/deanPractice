@@ -1,6 +1,9 @@
 const Course = global.model.Course;
+const Student = global.model.User;
 const Teacher_Course = global.model['Teacher-Course'];
 const Student_Course = global.model['Student-Course'];
+const Sequelize = require('sequelize');
+// const db = require('../db');
 
 let addCourse = async (ctx, next) => {
     await next();
@@ -65,6 +68,24 @@ let claimCourse = async (ctx, next) => {
         };
     })
 };
+let chooseCourse = async (ctx, next) =>{
+    await next();
+    let sId = ctx.request.body.studentId,
+        cNumber = ctx.request.body.courseNumber;
+    await Student_Course.create({
+        studentId: sId,
+        courseNumber: cNumber
+    }).then(res => {
+        ctx.body = {
+            code: 200
+        };
+    }).catch(err => {
+        ctx.body = {
+            code: 500,
+            content: err
+        };
+    })
+};
 let settleGrade = async (ctx, next) => {
     await next();
     let sId = ctx.request.body.studentId,
@@ -98,7 +119,13 @@ let settleGrade = async (ctx, next) => {
 let  queryTeacherCourse = async (ctx, next) => {
     await next();
     let tId = ctx.request.query.teacherId;
+    
+    Teacher_Course.belongsTo(Course,{foreignKey: 'courseNumber',targetKey: 'number'});
     await Teacher_Course.findAll({
+        include:[{
+            model: Course,
+            where: {number: Sequelize.col('`Teacher-Course`.courseNumber')}
+        }],
         where:{
             teacherId: tId
         }
@@ -144,7 +171,21 @@ let editCourse = async (ctx, next) => {
 let getCourseStudent = async(ctx, next) => {
     await next();
     let cNumber = ctx.request.query.courseNumber;
+
+    Student_Course.belongsTo(Course,{foreignKey: 'courseNumber',targetKey: 'number'});
+    Student_Course.belongsTo(Student,{foreignKey: 'studentId',targetKey: 'userId'});
     await Student_Course.findAll({
+        include:[
+            {
+                model: Course,
+                where: {number: Sequelize.col('`Student-Course`.courseNumber')}
+            },
+            {
+                model: Student,
+                where:{userId: Sequelize.col('`Student-Course`.studentId')
+                      }
+            }
+            ],
         where:{
             courseNumber: cNumber
         }
@@ -156,6 +197,40 @@ let getCourseStudent = async(ctx, next) => {
     })
 };
 
+let queryStudentCourse = async(ctx, next)=>{
+    await next();
+    let sId = ctx.request.query.studentId;
+    console.log('quey');
+    
+    // await db.sequelize.query("select * from `Student-Courses`,Courses where `Student-Courses`.courseNumber = Courses.number and studentId = ?;",{replacements: [sId],type: Sequelize.QueryTypes.SELECT}).then(res=>{
+    //     ctx.body = {
+    //         code: 200,
+    //         content: res
+    //     };
+    // });
+    
+    Student_Course.belongsTo(Course,{foreignKey: 'courseNumber',targetKey: 'number'});
+    await Student_Course.findAll({
+        include:[{
+            model: Course,
+            where: {number: Sequelize.col('`Student-Course`.courseNumber')}
+        }],
+        where: {
+            studentId : sId
+        }
+    }).then(res => {
+        ctx.body = {
+            code: 200,
+            content: res
+        };
+    }).catch(err => {
+        ctx.body = {
+            code: 500,
+            content: err
+        };
+    });
+};
+
 module.exports = {
     "POST /addCourse"  : addCourse,
     "GET /queryCourse" : queryCourse,
@@ -164,5 +239,7 @@ module.exports = {
     "GET /getCourseStudent"   : getCourseStudent,
     "POST /editCourse"        : editCourse,
     "GET /queryTeacherCourse" : queryTeacherCourse,
-    "POST /settleGrade"       : settleGrade
+    "POST /settleGrade"       : settleGrade,
+    "POST /chooseCourse"      : chooseCourse,
+    "GET /queryStudentCourse" : queryStudentCourse
 };

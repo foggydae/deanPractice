@@ -28,9 +28,9 @@
                     </thead>
                     <tbody>
                         <tr v-for="(course, index) in courses">
-                            <td>{{ course.name }}</td>
-                            <td>{{ course.number }}</td>
-                            <td>{{ course.information }}</td>
+                            <td>{{ course.Course.name }}</td>
+                            <td>{{ course.Course.number }}</td>
+                            <td>{{ course.Course.information }}</td>
                             <td><input type="number" v-model="course.grade1" /></td>
                             <td><input type="number" v-model="course.grade2" /></td>
                             <td><input type="number" v-model="course.grade3" /></td>
@@ -50,7 +50,7 @@
                             <th>courseNumber</th>
                             <th>courseName</th>
                             <th>studentId</th>
-                            <th>studentNumber</th>
+                            <th>studentName</th>
                             <th>grade1</th>
                             <th>grade2</th>
                             <th>grade3</th>
@@ -59,10 +59,10 @@
                     </thead>
                     <tbody>
                         <tr v-for="(student, index) in course_students">
-                            <td>{{ course.number }}</td>
-                            <td>{{ course.name }}</td>
+                            <td>{{ course.Course.number }}</td>
+                            <td>{{ course.Course.name }}</td>
                             <td>{{ student.studentId }}</td>
-                            <td>{{ student.name }}</td>
+                            <td>{{ student.User.name }}</td>
                             <td><input type="number" v-model="student.grade1" /></td>
                             <td><input type="number" v-model="student.grade2" /></td>
                             <td><input type="number" v-model="student.grade3" /></td>
@@ -161,8 +161,12 @@
                  });
              },
              manage: function(index) {
+                 console.log(
+                     {courseNumber: this.courses[index].courseNumber});
                  axios.get('api/getCourseStudent',{
-                     courseNumber: this.courses[index].courseNumber
+                     params:{
+                         courseNumber: this.courses[index].courseNumber
+                     }
                  }).then(response => {
                      let body = response.data;
                      if(body.code === 200)
@@ -173,7 +177,7 @@
                  })
              }
          }
-     })
+     });
     </script>
     <script>
      let cC = new Vue({
