@@ -1,0 +1,5 @@
+* dean practice
+  - just a simplest dean webpage
+  - use node koa as backend
+  - use vue.js as frontend
+  - separate frontend and backend
