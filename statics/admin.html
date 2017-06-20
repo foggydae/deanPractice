@@ -103,6 +103,14 @@
     <script type="text/javascript" src="libs/js/vue.min.js"></script>
     <script type="text/javascript" src="libs/js/axios.min.js"></script>
     <script>
+     axios.get("api/userState")
+          .then(response => {
+              data = response.data;
+              if(data.content.state !== 'admin')
+                  {
+                      window.location.href = 'login.html';
+                  }
+     });
      window.isPerson = true;
      let qP = new Vue({
          el:".queryPerson",

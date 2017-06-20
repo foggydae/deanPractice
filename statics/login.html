@@ -20,10 +20,15 @@
                  console.log('dologin');
                  if(this.userId !== '' && this.passwd !== '')
                      {
-                         axios.post('api/userState',{
-                             state: 'student'
+                         axios.post('api/login',{
+                             id:this.userId,
+                         passwd:this.passwd
                          }).then((response) =>{
                              console.log(response);
+                             if(response.data.code === 200)
+                                 {
+                                     window.location.href = response.data.content + '.html';
+                                 }
 //                             window.location.href = '/';
                          }).catch((error) => {
                              console.log(error);

@@ -60,7 +60,19 @@
     <script type="text/javascript" src="libs/js/axios.min.js"></script>
     <script type="text/javascript" src="libs/js/vue.min.js"></script>
     <script>
-     window.sId = '1300012757';
+     //window.sId = '1300012757';
+ axios.get("api/userState")
+          .then(response => {
+              data = response.data;
+              if(data.content.state !== 'student')
+                  {
+                      window.location.href = 'login.html';
+                  }
+              else
+                  {
+                      window.sId = data.content.id;
+                  }
+     });
     </script>
     <script>
      let mC = new Vue({
